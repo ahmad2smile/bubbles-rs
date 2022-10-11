@@ -1,0 +1,19 @@
+[package]
+name = "bubbles"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "bubbles"
+path = "src/lib.rs"
+
+[[bin]]
+name = "bubbles"
+path = "src/bin/bin.rs" 
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+crossterm = "0.25.0"
+fast-srgb8 = "1.0.0"
+palette = "0.6.1"
