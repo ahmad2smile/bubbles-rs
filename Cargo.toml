@@ -2,6 +2,13 @@
 name = "bubbles"
 version = "0.1.0"
 edition = "2021"
+license = "MIT"
+readme = "README.md"
+license-file = "LICENSE"
+repository = "https://github.com/ahmad2smile/bubbles-rs"
+homepage = "https://github.com/ahmad2smile/bubbles-rs"
+keywords = ["bubbles", "tui"]
+description = "A TUI Framework inspired by Go Bubbles"
 
 [lib]
 name = "bubbles"
