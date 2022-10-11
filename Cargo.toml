@@ -9,6 +9,9 @@ repository = "https://github.com/ahmad2smile/bubbles-rs"
 homepage = "https://github.com/ahmad2smile/bubbles-rs"
 keywords = ["bubbles", "tui"]
 description = "A TUI Framework inspired by Go Bubbles"
+exclude = [
+    "bin/**/*",
+]
 
 [lib]
 name = "bubbles"

@@ -2,7 +2,7 @@ use std::str::FromStr;
 
 use crossterm::style::Color;
 use fast_srgb8::f32_to_srgb8;
-use palette::{Gradient, LinSrgb, Shade, Srgb};
+use palette::{Gradient, LinSrgb, Shade};
 
 use super::{Component, Instruction};
 
