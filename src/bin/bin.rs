@@ -1,7 +1,16 @@
-use bubbles;
+use bubbles::{self, app::App};
+use examples::progress_bar::create_progress_bar;
+
+pub mod examples;
 
 fn main() {
-    let root = bubbles::components::progress::Progress::new(100, vec!["#5A56E0", "#EE6FF8"]);
+    let app = App::new();
 
-    bubbles::app::run(&root).unwrap();
+    let mut root = create_progress_bar().unwrap();
+
+    let result = app.run(&mut root);
+
+    if let Err(err) = result {
+        println!("Error: {:?}", err);
+    }
 }

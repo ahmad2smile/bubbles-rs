@@ -1,6 +1,7 @@
 pub mod app;
 pub mod colors;
 pub mod components;
+pub mod core;
 
 pub fn add(left: usize, right: usize) -> usize {
     left + right
