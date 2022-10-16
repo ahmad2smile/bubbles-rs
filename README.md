@@ -14,7 +14,7 @@ Progress::new(
     Ok(&update_handler),
 )
 ```
-![image](https://user-images.githubusercontent.com/6108922/196053815-7e8b1e87-4546-4e41-9343-229d91007123.png)
+![image](https://user-images.githubusercontent.com/6108922/196055972-9af622ae-d5cc-48fb-b7a5-504a954ec9bf.png)
 
 
 Further examples under [bin](./src/bin/examples/)
