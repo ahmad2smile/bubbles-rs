@@ -1,21 +1,21 @@
 use crossterm::style::Color;
 
+use super::dimension::Dimension;
+
 #[derive(Clone)]
 pub struct View {
     pub content: String,
-    pub x: u16,
-    pub y: u16,
+    pub dimension: Dimension,
     pub background: Color,
     pub color: Color,
 }
 
 impl View {
-    pub fn new(content: String, x: u16, y: u16, color: Color, background: Color) -> Self {
+    pub fn new(content: String, dimension: Dimension, color: Color, background: Color) -> Self {
         Self {
             content,
             color,
-            x,
-            y,
+            dimension,
             background,
         }
     }
@@ -23,8 +23,7 @@ impl View {
     pub fn default() -> Self {
         Self {
             content: "".to_owned(),
-            x: 0,
-            y: 0,
+            dimension: Dimension::default(),
             color: Color::Black,
             background: Color::Black,
         }
