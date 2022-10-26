@@ -19,8 +19,10 @@ impl View {
             background,
         }
     }
+}
 
-    pub fn default() -> Self {
+impl Default for View {
+    fn default() -> Self {
         Self {
             content: "".to_owned(),
             dimension: Dimension::default(),

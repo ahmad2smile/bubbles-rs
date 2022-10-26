@@ -1,6 +1,6 @@
 use crossterm::{
     cursor, event,
-    event::{DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
+    event::{DisableMouseCapture, EnableMouseCapture, Event, KeyCode, KeyEvent, KeyModifiers},
     execute,
     style::{self, Stylize},
     terminal::{self, disable_raw_mode, enable_raw_mode, LeaveAlternateScreen},
@@ -11,15 +11,19 @@ use std::{
     time::{Duration, Instant},
 };
 
-use crate::core::{lifecycle::LifeCycle, render::Render};
+use crate::core::component::Component;
 
 pub struct App {
     pub fps: u8,
+    components: Vec<Box<dyn Component>>,
 }
 
 impl App {
     pub fn new() -> Self {
-        Self { fps: 60 }
+        Self {
+            fps: 60,
+            components: vec![],
+        }
     }
 
     pub fn set_fps(&mut self, fps: u8) -> &mut Self {
@@ -28,10 +32,7 @@ impl App {
         self
     }
 
-    pub fn run<C>(&self, root: &mut C) -> Result<()>
-    where
-        C: Render + LifeCycle,
-    {
+    pub fn run(&mut self) -> Result<()> {
         let mut stdout = std_init();
 
         enable_raw_mode()?;
@@ -39,7 +40,7 @@ impl App {
         execute!(stdout, terminal::Clear(terminal::ClearType::All))?;
         execute!(stdout, LeaveAlternateScreen, EnableMouseCapture)?;
 
-        self.app_loop(root, &mut stdout)?;
+        self.app_loop(&mut stdout)?;
 
         disable_raw_mode()?;
         execute!(stdout, LeaveAlternateScreen, DisableMouseCapture)?;
@@ -47,15 +48,12 @@ impl App {
         Ok(())
     }
 
-    fn app_loop<C>(&self, root: &mut C, stdout: &mut Stdout) -> Result<()>
-    where
-        C: Render + LifeCycle,
-    {
+    fn app_loop(&mut self, stdout: &mut Stdout) -> Result<()> {
         let mut tick = Instant::now();
         let tick_rate = Duration::from_millis((1 / self.fps).into());
 
         loop {
-            self.render(root, stdout)?;
+            self.render(stdout, None)?;
 
             // Delay b/w frames
             let timeout = tick_rate
@@ -63,11 +61,24 @@ impl App {
                 .unwrap_or_else(|| Duration::from_secs(0));
 
             if event::poll(timeout)? {
-                if let Event::Key(key) = event::read()? {
-                    if let KeyCode::Char('q') = key.code {
-                        return Ok(());
-                    }
-                }
+                match event::read()? {
+                    event => match event {
+                        Event::Key(KeyEvent {
+                            modifiers: KeyModifiers::CONTROL,
+                            code: KeyCode::Char('c'),
+                            ..
+                        }) => return Ok(()),
+                        Event::Key(event) => {
+                            self.render(stdout, Some(event))?;
+                        }
+                        // Event::FocusGained => todo!(),
+                        // Event::FocusLost => todo!(),
+                        // Event::Mouse(_) => todo!(),
+                        // Event::Paste(_) => todo!(),
+                        // Event::Resize(_, _) => todo!(),
+                        _ => (),
+                    },
+                };
             }
 
             if tick.elapsed() >= tick_rate {
@@ -76,23 +87,31 @@ impl App {
         }
     }
 
-    fn render<C>(&self, root: &mut C, stdout: &mut Stdout) -> Result<()>
-    where
-        C: Render + LifeCycle,
-    {
-        let view = root.render();
+    fn render(&mut self, stdout: &mut Stdout, key_event: Option<KeyEvent>) -> Result<()> {
+        for component in &mut self.components {
+            component.handle_render();
 
-        root.handle_render();
+            if let Some(key_e) = key_event {
+                component.handle_key_event(key_e);
+            }
 
-        let mut content = view.content.stylize().with(view.color);
+            let view = component.render();
 
-        content.as_mut().background_color = Some(view.background);
+            let mut content = view.content.stylize().with(view.color);
 
-        stdout
-            .queue(cursor::MoveTo(view.dimension.x, view.dimension.y))?
-            .queue(style::PrintStyledContent(content))?;
+            content.as_mut().background_color = Some(view.background);
+
+            stdout
+                .queue(cursor::MoveTo(view.dimension.x, view.dimension.y))?
+                .queue(style::PrintStyledContent(content))?;
+        }
+
         stdout.flush()?;
 
         Ok(())
+    }
+
+    pub fn register(&mut self, c: Box<dyn Component>) {
+        self.components.push(c);
     }
 }

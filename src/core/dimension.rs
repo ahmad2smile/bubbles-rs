@@ -15,8 +15,10 @@ impl Dimension {
             height,
         }
     }
+}
 
-    pub fn default() -> Self {
+impl Default for Dimension {
+    fn default() -> Self {
         Self {
             x: 0,
             y: 0,

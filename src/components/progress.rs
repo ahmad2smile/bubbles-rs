@@ -1,12 +1,15 @@
 use std::cmp;
 
-use crossterm::style::Stylize;
+use crossterm::{
+    event::{KeyEvent, MouseEvent},
+    style::Stylize,
+};
 
 use crate::{
     colors::gradient::Gradients,
     core::{
-        dimension::Dimension, lifecycle::LifeCycle, mutators::OnRender, render::Render,
-        style::Style, view::View,
+        component::Component, dimension::Dimension, events::EventHandler, lifecycle::LifeCycle,
+        render::Render, renderer::Renderer, style::Style, view::View,
     },
 };
 
@@ -17,7 +20,7 @@ pub struct Progress<'a> {
     pub dimension: Dimension,
     content: &'static str,
     content_empty: &'static str,
-    pub renderer: OnRender<'a, Self>,
+    pub renderer: Renderer<'a, Self>,
 }
 
 impl<'a> Progress<'a> {
@@ -28,7 +31,7 @@ impl<'a> Progress<'a> {
         value: usize,
         style: Style,
         dimension: Dimension,
-        renderer: OnRender<'a, Self>,
+        renderer: Renderer<'a, Self>,
     ) -> Self {
         Self {
             value,
@@ -39,20 +42,18 @@ impl<'a> Progress<'a> {
             content_empty: Progress::CONTENT_EMPTY,
         }
     }
+}
 
-    pub fn default() -> Self {
+impl Default for Progress<'_> {
+    fn default() -> Self {
         Self {
             value: 0,
             dimension: Dimension::default(),
             style: Style::default(),
             content: Progress::CONTENT,
             content_empty: Progress::CONTENT_EMPTY,
-            renderer: OnRender::default(),
+            renderer: Renderer::default(),
         }
-    }
-
-    pub fn update_value(&mut self, value: usize) {
-        self.value = cmp::min(self.dimension.width, value);
     }
 }
 
@@ -86,4 +87,13 @@ impl LifeCycle for Progress<'_> {
     }
 
     fn handle_unmount(&mut self) {}
+}
+
+impl Component for Progress<'_> {}
+impl EventHandler for Progress<'_> {
+    fn handle_key_event(&mut self, _event: KeyEvent) {}
+
+    fn handle_mouse_event(&mut self, _event: MouseEvent) {}
+
+    fn handle_paste_event(&mut self, _event: MouseEvent) {}
 }

@@ -15,8 +15,10 @@ impl Style {
             background,
         }
     }
+}
 
-    pub fn default() -> Self {
+impl Default for Style {
+    fn default() -> Self {
         Self {
             gradient: vec!["#AAAAAA", "#FFFFFF"],
             color: Color::DarkGrey,
